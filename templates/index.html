@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI-Based Fake Job Detection and Verification System</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <div style="display: flex; justify-content: flex-end; align-items: center; gap: 15px; padding: 15px 25px;">
+    <span>
+        Welcome, {{ session.get("username", "User") }}
+    </span>
+
+    <a href="{{ url_for('history') }}">
+        View History
+    </a>
+
+    <a href="{{ url_for('logout') }}">
+        Logout
+    </a>
+</div>
+  <div class="page">
+
+    <header class="masthead">
+      <p class="masthead__brand">AI-Based Fake Job Detection and Verification System</p>
+      <h1>Analyze a Job Posting</h1>
+      <p>Provide the job details below so the system can analyze the
+        posting. The system analyzes job posting content and company
+        contact details to identify potential warning signs associated
+        with fraudulent job postings — and gives you the result in plain
+        language, no technical knowledge needed.</p>
+      <a href="{{ url_for('history') }}" class="btn btn--secondary">View Analysis History</a>
+    </header>
+
+    <section class="section">
+      <h2 class="section__title">How it works</h2>
+      <p class="section__hint">Four simple steps.</p>
+
+      <div class="field-grid">
+        <div class="field">
+          <p><strong>1. Paste in the posting</strong></p>
+          <p class="section__hint">Copy the job title and description from the listing you want to check.</p>
+        </div>
+
+        <div class="field">
+          <p><strong>2. Add company details</strong> <span class="optional">(optional)</span></p>
+          <p class="section__hint">If you have the company's name, website, or contact email, add them for a fuller check.</p>
+        </div>
+
+        <div class="field">
+          <p><strong>3. Click Analyze</strong></p>
+          <p class="section__hint">The trained model reviews the posting in a few seconds.</p>
+        </div>
+
+        <div class="field">
+          <p><strong>4. Review your results</strong></p>
+          <p class="section__hint">See the risk score, warning signs, and company verification side by side.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section__title">What this system checks</h2>
+
+      <div class="field-grid">
+        <div class="field">
+          <p><strong>AI detection</strong></p>
+          <p class="section__hint">A trained machine learning model reviews the posting text for common fraud patterns.</p>
+        </div>
+
+        <div class="field">
+          <p><strong>Risk analysis</strong></p>
+          <p class="section__hint">A 0–100 risk score and a Low / Medium / High risk level, with plain-English reasons.</p>
+        </div>
+
+        <div class="field">
+          <p><strong>Company verification</strong></p>
+          <p class="section__hint">Simple checks on the company name, website, and email for mismatches or missing details.</p>
+        </div>
+
+        <div class="field">
+          <p><strong>Analysis history</strong></p>
+          <p class="section__hint">Every analysis is saved so you can look back at past results anytime.</p>
+        </div>
+      </div>
+    </section>
+
+    {% if error %}
+      <div class="notice" role="alert">{{ error }}</div>
+    {% endif %}
+
+    <form action="{{ url_for('predict') }}" method="POST" novalidate>
+
+      <!-- ============================================================
+           JOB INFORMATION
+           ============================================================ -->
+      <section class="section">
+        <h2 class="section__title">Job information</h2>
+        <p class="section__hint">Title and description are required.</p>
+
+        <div class="field-grid">
+          <div class="field field--full">
+            <label for="title">Job title *</label>
+            <input type="text" id="title" name="title" required
+                   value="{{ form_data.get('title', '') }}">
+          </div>
+
+          <div class="field field--full">
+            <label for="description">Job description *</label>
+            <textarea id="description" name="description" required rows="5"
+                      placeholder="Paste the complete job description here.">{{ form_data.get('description', '') }}</textarea>
+          </div>
+
+          <div class="field field--full">
+            <label for="company_profile">Company profile <span class="optional">(optional)</span></label>
+            <textarea id="company_profile" name="company_profile" rows="4">{{ form_data.get('company_profile', '') }}</textarea>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           JOB DETAILS
+           ============================================================ -->
+      <section class="section">
+        <h2 class="section__title">Job details</h2>
+        <p class="section__hint">All fields in this section are optional. Leave anything you don't know blank.</p>
+
+        <div class="field-grid">
+          <div class="field">
+            <label for="location">Location <span class="optional">(optional)</span></label>
+            <input type="text" id="location" name="location" placeholder="e.g. US, NY, New York"
+                   value="{{ form_data.get('location', '') }}">
+          </div>
+
+          <div class="field">
+            <label for="department">Department <span class="optional">(optional)</span></label>
+            <input type="text" id="department" name="department"
+                   value="{{ form_data.get('department', '') }}">
+          </div>
+
+          <div class="field">
+            <label for="salary_range">Salary range <span class="optional">(optional)</span></label>
+            <input type="text" id="salary_range" name="salary_range" placeholder="e.g. 40000-50000"
+                   value="{{ form_data.get('salary_range', '') }}">
+          </div>
+
+          <div class="field">
+            <label for="industry">Industry <span class="optional">(optional)</span></label>
+            <input type="text" id="industry" name="industry"
+                   value="{{ form_data.get('industry', '') }}">
+          </div>
+
+          <div class="field">
+            <label for="employment_type">Employment type <span class="optional">(optional)</span></label>
+            <select id="employment_type" name="employment_type">
+              <option value="">Not specified</option>
+              {% for option in dropdown_options.get('employment_type', []) %}
+                <option value="{{ option }}" {% if form_data.get('employment_type') == option %}selected{% endif %}>{{ option }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="required_experience">Required experience <span class="optional">(optional)</span></label>
+            <select id="required_experience" name="required_experience">
+              <option value="">Not specified</option>
+              {% for option in dropdown_options.get('required_experience', []) %}
+                <option value="{{ option }}" {% if form_data.get('required_experience') == option %}selected{% endif %}>{{ option }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="required_education">Required education <span class="optional">(optional)</span></label>
+            <select id="required_education" name="required_education">
+              <option value="">Not specified</option>
+              {% for option in dropdown_options.get('required_education', []) %}
+                <option value="{{ option }}" {% if form_data.get('required_education') == option %}selected{% endif %}>{{ option }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="function">Function <span class="optional">(optional)</span></label>
+            <select id="function" name="function">
+              <option value="">Not specified</option>
+              {% for option in dropdown_options.get('function', []) %}
+                <option value="{{ option }}" {% if form_data.get('function') == option %}selected{% endif %}>{{ option }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           ADDITIONAL INFORMATION
+           ============================================================ -->
+      <section class="section">
+        <h2 class="section__title">Additional information</h2>
+        <p class="section__hint">Optional. Paste in as much of the original listing as you have.</p>
+
+        <div class="field-grid">
+          <div class="field field--full">
+            <label for="requirements">Requirements <span class="optional">(optional)</span></label>
+            <textarea id="requirements" name="requirements" rows="4">{{ form_data.get('requirements', '') }}</textarea>
+          </div>
+
+          <div class="field field--full">
+            <label for="benefits">Benefits <span class="optional">(optional)</span></label>
+            <textarea id="benefits" name="benefits" rows="4">{{ form_data.get('benefits', '') }}</textarea>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           POSTING SIGNALS
+           ============================================================ -->
+      <section class="section">
+        <h2 class="section__title">Posting signals</h2>
+        <p class="section__hint">Check any that apply to this posting.</p>
+
+        <div class="checkbox-list">
+          <div class="checkbox-row">
+            <input type="checkbox" id="telecommuting" name="telecommuting"
+                   {% if form_data.get('telecommuting') %}checked{% endif %}>
+            <label for="telecommuting">Telecommuting / remote position</label>
+          </div>
+
+          <div class="checkbox-row">
+            <input type="checkbox" id="has_company_logo" name="has_company_logo"
+                   {% if form_data.get('has_company_logo') %}checked{% endif %}>
+            <label for="has_company_logo">Company logo available</label>
+          </div>
+
+          <div class="checkbox-row">
+            <input type="checkbox" id="has_questions" name="has_questions"
+                   {% if form_data.get('has_questions') %}checked{% endif %}>
+            <label for="has_questions">Screening questions included</label>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           COMPANY VERIFICATION DETAILS (Day 6)
+           This is a separate, independent analysis from the ML job
+           prediction above — these three fields are only used by
+           src/company_verification.py, never by predict_job().
+           ============================================================ -->
+      <section class="section">
+        <h2 class="section__title">Company verification</h2>
+        <p class="section__hint">
+          Optional. If provided, these are checked for simple, explainable
+          warning signals (such as a missing website or mismatched email
+          domain) — separately from the job-posting analysis above.
+        </p>
+
+        <div class="field-grid">
+          <div class="field">
+            <label for="company_name">Company name <span class="optional">(optional)</span></label>
+            <input type="text" id="company_name" name="company_name"
+                   value="{{ form_data.get('company_name', '') }}">
+          </div>
+
+          <div class="field">
+            <label for="company_website">Company website <span class="optional">(optional)</span></label>
+            <input type="text" id="company_website" name="company_website" placeholder="e.g. https://example.com"
+                   value="{{ form_data.get('company_website', '') }}">
+            <p class="field-hint">Enter the official company website if available.</p>
+          </div>
+
+          <div class="field field--full">
+            <label for="application_email">Application email <span class="optional">(optional)</span></label>
+            <input type="text" id="application_email" name="application_email" placeholder="e.g. jobs@example.com"
+                   value="{{ form_data.get('application_email', '') }}">
+            <p class="field-hint">Enter the email address provided for job applications.</p>
+          </div>
+        </div>
+      </section>
+
+      <div class="form-actions">
+        <button type="submit" class="btn">Analyze Job Posting</button>
+        <p class="disclaimer">
+          This tool provides an automated risk assessment and should not be
+          treated as final proof that a job is genuine or fraudulent.
+        </p>
+      </div>
+
+    </form>
+  </div>
+  
+</body>
+</html>

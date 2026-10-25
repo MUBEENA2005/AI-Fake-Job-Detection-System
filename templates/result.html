@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analysis Result — AI-Based Fake Job Detection and Verification System</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <div style="display: flex; justify-content: flex-end; gap: 15px; padding: 15px 25px;">
+    <a href="{{ url_for('index') }}">
+        New Analysis
+    </a>
+
+    <a href="{{ url_for('history') }}">
+        History
+    </a>
+
+    <a href="{{ url_for('logout') }}">
+        Logout
+    </a>
+</div>
+  <div class="page">
+
+    <header class="masthead">
+      <p class="masthead__brand">AI-Based Fake Job Detection and Verification System</p>
+      <h1>Analysis Result</h1>
+      <p>Here is what the system found. The result below is generated directly by the trained model and verification checks — nothing on this page is estimated or made up.</p>
+    </header>
+
+    {% set is_fraudulent = (result.predicted_label == 'Fraudulent') %}
+    {% set risk_level = result.risk_level %}
+    {% if risk_level == 'Low Risk' %}
+      {% set pill_class = 'pill--low' %}
+    {% elif risk_level == 'Medium Risk' %}
+      {% set pill_class = 'pill--medium' %}
+    {% else %}
+      {% set pill_class = 'pill--high' %}
+    {% endif %}
+
+    {% if risk_level == 'Low Risk' %}
+      {% set risk_explainer = 'Few warning signs were detected.' %}
+    {% elif risk_level == 'Medium Risk' %}
+      {% set risk_explainer = 'Some warning signs were detected. Review the job carefully.' %}
+    {% else %}
+      {% set risk_explainer = 'Several warning signs were detected. Verify the employer and job details before sharing personal information or paying any fees.' %}
+    {% endif %}
+
+    <p class="part-label">A. Overall assessment</p>
+    <div class="verdict {% if is_fraudulent %}verdict--fraudulent{% else %}verdict--genuine{% endif %}">
+      <p class="verdict__label">Model prediction</p>
+      <p class="verdict__value {% if is_fraudulent %}verdict__value--fraudulent{% else %}verdict__value--genuine{% endif %}">
+        {{ result.predicted_label }}
+      </p>
+
+      <div class="verdict__meta">
+        <div>
+          <span class="verdict__score-label">Model-derived risk score</span>
+          <span class="verdict__score">{{ "%.2f"|format(result.risk_score) }} / 100</span>
+        </div>
+        <div>
+          <span class="verdict__score-label">Risk level</span>
+          <span class="pill {{ pill_class }}">{{ risk_level }}</span>
+        </div>
+      </div>
+
+      <p class="verdict__explainer">{{ risk_explainer }}</p>
+    </div>
+
+    <p class="part-label">B. Why this result was generated</p>
+    <section class="result-section">
+      <h2 class="result-section__title">Risk indicators</h2>
+      {% if result.risk_indicators %}
+        <ul class="indicator-list">
+          {% for indicator in result.risk_indicators %}
+            <li>{{ indicator }}</li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="no-indicators">No rule-based risk indicators were detected for this posting.</p>
+      {% endif %}
+    </section>
+
+    <div class="disclaimer">
+      {{ result.disclaimer }}
+    </div>
+
+    <!-- ================================================================
+         COMPANY VERIFICATION (Day 6)
+         A separate, independent analysis from the ML job risk analysis
+         above. Its score is never combined with result.risk_score, and
+         is never described as a probability.
+         ================================================================ -->
+    {% set v_level = verification_result.verification_level %}
+    {% if v_level == 'Low Risk' %}
+      {% set v_pill_class = 'pill--low' %}
+      {% set v_border_class = 'verdict--risk-low' %}
+    {% elif v_level == 'Medium Risk' %}
+      {% set v_pill_class = 'pill--medium' %}
+      {% set v_border_class = 'verdict--risk-medium' %}
+    {% else %}
+      {% set v_pill_class = 'pill--high' %}
+      {% set v_border_class = 'verdict--risk-high' %}
+    {% endif %}
+
+    {% if v_level == 'Low Risk' %}
+      {% set v_explainer = 'Few company verification concerns were detected.' %}
+    {% elif v_level == 'Medium Risk' %}
+      {% set v_explainer = 'Some company verification concerns were detected. Review the company details carefully.' %}
+    {% else %}
+      {% set v_explainer = 'Several company verification concerns were detected. Verify the employer independently before sharing personal information or paying any fees.' %}
+    {% endif %}
+
+    <p class="part-label">C. Company verification</p>
+    <div class="verdict {{ v_border_class }}">
+      <p class="verdict__label">Company verification</p>
+
+      <dl class="kv-list">
+        <div class="kv-row">
+          <dt>Company name provided</dt>
+          <dd>{{ 'Yes' if verification_result.company_name_provided else 'No' }}</dd>
+        </div>
+        <div class="kv-row">
+          <dt>Website provided</dt>
+          <dd>{{ 'Yes' if verification_result.website_provided else 'No' }}</dd>
+        </div>
+        <div class="kv-row">
+          <dt>Website domain</dt>
+          <dd>{{ verification_result.website_domain or '—' }}</dd>
+        </div>
+        <div class="kv-row">
+          <dt>Application email provided</dt>
+          <dd>{{ 'Yes' if verification_result.email_provided else 'No' }}</dd>
+        </div>
+        <div class="kv-row">
+          <dt>Email domain</dt>
+          <dd>{{ verification_result.email_domain or '—' }}</dd>
+        </div>
+        <div class="kv-row">
+          <dt>Free email provider used</dt>
+          <dd>{{ 'Yes' if verification_result.is_free_email_provider else 'No' }}</dd>
+        </div>
+        <div class="kv-row">
+          <dt>Website / email domain comparison</dt>
+          <dd>{{ verification_result.domain_comparison|replace('_', ' ')|title }}</dd>
+        </div>
+      </dl>
+
+      <div class="verdict__meta">
+        <div>
+          <span class="verdict__score-label">Verification risk score</span>
+          <span class="verdict__score">{{ "%.2f"|format(verification_result.verification_score) }} / 100</span>
+        </div>
+        <div>
+          <span class="verdict__score-label">Verification risk level</span>
+          <span class="pill {{ v_pill_class }}">{{ v_level }}</span>
+        </div>
+      </div>
+
+      <p class="verdict__explainer">{{ v_explainer }}</p>
+    </div>
+
+    <section class="result-section">
+      <h2 class="result-section__title">Verification findings</h2>
+      {% if verification_result.verification_findings %}
+        <ul class="indicator-list">
+          {% for finding in verification_result.verification_findings %}
+            <li>{{ finding }}</li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="no-indicators">No verification findings to display.</p>
+      {% endif %}
+    </section>
+
+    <div class="disclaimer">
+      {{ verification_result.disclaimer }}
+    </div>
+
+    <p class="part-label">D. Model information</p>
+    <section class="result-section">
+      <h2 class="result-section__title">Model used</h2>
+      <p class="model-used">This assessment was generated by: <span>{{ result.model_name }}</span></p>
+    </section>
+
+    <p class="part-label">E. Important disclaimer</p>
+    <section class="result-section">
+      <h2 class="result-section__title">Please read before acting on this result</h2>
+      <p class="model-used">
+        Both scores above are automated risk assessments generated from the
+        information supplied — they are not proof that this job posting or
+        company is genuine or fraudulent. Use them as a starting point, and
+        independently verify the employer, the posting, and any contact
+        details before sharing personal information or paying any fees.
+      </p>
+    </section>
+
+    <div class="result-actions">
+      <a href="{{ url_for('index') }}" class="btn btn--secondary">Analyze another job</a>
+      <a href="{{ url_for('history') }}" class="btn btn--secondary">View Analysis History</a>
+    </div>
+
+  </div>
+</body>
+</html>

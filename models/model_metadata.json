@@ -1,0 +1,18 @@
+{
+  "model_name": "Linear SVM (LinearSVC)",
+  "feature_count": 3081,
+  "training_row_count": 14304,
+  "test_row_count": 3576,
+  "evaluation_metrics": {
+    "accuracy": 0.9793064876957495,
+    "precision_fraudulent": 0.746268656716418,
+    "recall_fraudulent": 0.8670520231213873,
+    "f1_fraudulent": 0.8021390374331551,
+    "precision_genuine": 0.9931851851851852,
+    "recall_genuine": 0.9850132236262121,
+    "f1_genuine": 0.9890823251696665
+  },
+  "random_state": 42,
+  "class_imbalance_handling": "class_weight='balanced' (no resampling/SMOTE applied)",
+  "model_file": "models\\best_model.joblib"
+}

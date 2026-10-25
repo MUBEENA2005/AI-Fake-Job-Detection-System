@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Login - AI Fake Job Detection</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f4f7fb;
+            font-family: Arial, sans-serif;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 420px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .login-card {
+            background: white;
+            padding: 35px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.10);
+        }
+
+        .login-title {
+            text-align: center;
+            margin-bottom: 8px;
+            color: #1f4e79;
+        }
+
+        .login-subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 28px;
+            font-size: 14px;
+        }
+
+        .login-label {
+            display: block;
+            margin-bottom: 7px;
+            font-weight: 600;
+        }
+
+        .login-input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px;
+            margin-bottom: 18px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+
+        .login-input:focus {
+            outline: none;
+            border-color: #1f4e79;
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            background: #1f4e79;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .login-button:hover {
+            opacity: 0.92;
+        }
+
+        .login-error {
+            background: #ffe6e6;
+            color: #a00000;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 18px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .flash-message {
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .flash-success {
+            background: #e6f6ea;
+            color: #176b2c;
+        }
+
+        .flash-warning {
+            background: #fff4d6;
+            color: #795600;
+        }
+
+        .login-register {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        .login-register a {
+            color: #1f4e79;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .login-register a:hover {
+            text-decoration: underline;
+        }
+
+        .login-footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #777;
+            font-size: 12px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="login-container">
+
+    <div class="login-card">
+
+        <h1 class="login-title">
+            AI Fake Job Detection
+        </h1>
+
+        <p class="login-subtitle">
+            Detection and Verification System
+        </p>
+
+
+        <!-- ======================================================
+             FLASH MESSAGES
+             ====================================================== -->
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+
+            {% if messages %}
+
+                {% for category, message in messages %}
+
+                    <div class="flash-message flash-{{ category }}">
+                        {{ message }}
+                    </div>
+
+                {% endfor %}
+
+            {% endif %}
+
+        {% endwith %}
+
+
+        <!-- ======================================================
+             LOGIN ERROR
+             ====================================================== -->
+
+        {% if error %}
+
+            <div class="login-error">
+                {{ error }}
+            </div>
+
+        {% endif %}
+
+
+        <!-- ======================================================
+             LOGIN FORM
+             ====================================================== -->
+
+        <form method="POST"
+              action="{{ url_for('login') }}">
+
+            <label class="login-label"
+                   for="username">
+
+                Username or Email
+
+            </label>
+
+            <input
+                type="text"
+                id="username"
+                name="username"
+                class="login-input"
+                placeholder="Enter username or email"
+                autocomplete="username"
+                required
+            >
+
+
+            <label class="login-label"
+                   for="password">
+
+                Password
+
+            </label>
+
+            <input
+                type="password"
+                id="password"
+                name="password"
+                class="login-input"
+                placeholder="Enter password"
+                autocomplete="current-password"
+                required
+            >
+
+
+            <button
+                type="submit"
+                class="login-button">
+
+                Login
+
+            </button>
+
+        </form>
+
+
+        <!-- ======================================================
+             REGISTER LINK
+             ====================================================== -->
+
+        <p class="login-register">
+
+            Don't have an account?
+
+            <a href="{{ url_for('register') }}">
+                Create an account
+            </a>
+
+        </p>
+
+
+        <div class="login-footer">
+
+            Secure user authentication
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

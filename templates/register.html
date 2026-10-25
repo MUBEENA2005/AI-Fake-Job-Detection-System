@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Create Account - AI Fake Job Detection</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f4f7fb;
+            font-family: Arial, sans-serif;
+        }
+
+        .register-container {
+            width: 100%;
+            max-width: 450px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .register-card {
+            background: white;
+            padding: 35px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.10);
+        }
+
+        .register-title {
+            text-align: center;
+            color: #1f4e79;
+            margin-bottom: 8px;
+        }
+
+        .register-subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 28px;
+            font-size: 14px;
+        }
+
+        .register-label {
+            display: block;
+            margin-bottom: 7px;
+            font-weight: 600;
+        }
+
+        .register-input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px;
+            margin-bottom: 18px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+
+        .register-input:focus {
+            outline: none;
+            border-color: #1f4e79;
+        }
+
+        .register-button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            background: #1f4e79;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .register-button:hover {
+            opacity: 0.92;
+        }
+
+        .register-message {
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .register-success {
+            background: #e6f6ea;
+            color: #176b2c;
+        }
+
+        .register-warning {
+            background: #fff4d6;
+            color: #795600;
+        }
+
+        .register-login {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        .register-login a {
+            color: #1f4e79;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .register-login a:hover {
+            text-decoration: underline;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="register-container">
+
+    <div class="register-card">
+
+        <h1 class="register-title">
+            Create Account
+        </h1>
+
+        <p class="register-subtitle">
+            AI-Based Fake Job Detection and Verification System
+        </p>
+
+
+        <!-- ======================================================
+             FLASH MESSAGES
+             ====================================================== -->
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+
+            {% if messages %}
+
+                {% for category, message in messages %}
+
+                    <div class="register-message register-{{ category }}">
+                        {{ message }}
+                    </div>
+
+                {% endfor %}
+
+            {% endif %}
+
+        {% endwith %}
+
+
+        <!-- ======================================================
+             REGISTRATION FORM
+             ====================================================== -->
+
+        <form method="POST"
+              action="{{ url_for('register') }}">
+
+            <label class="register-label"
+                   for="username">
+
+                Username
+
+            </label>
+
+            <input
+                type="text"
+                id="username"
+                name="username"
+                class="register-input"
+                placeholder="Enter username"
+                autocomplete="username"
+                required
+            >
+
+
+            <label class="register-label"
+                   for="email">
+
+                Email
+
+            </label>
+
+            <input
+                type="email"
+                id="email"
+                name="email"
+                class="register-input"
+                placeholder="Enter email"
+                autocomplete="email"
+                required
+            >
+
+
+            <label class="register-label"
+                   for="password">
+
+                Password
+
+            </label>
+
+            <input
+                type="password"
+                id="password"
+                name="password"
+                class="register-input"
+                placeholder="Create password"
+                autocomplete="new-password"
+                minlength="6"
+                required
+            >
+
+
+            <label class="register-label"
+                   for="confirm_password">
+
+                Confirm Password
+
+            </label>
+
+            <input
+                type="password"
+                id="confirm_password"
+                name="confirm_password"
+                class="register-input"
+                placeholder="Confirm password"
+                autocomplete="new-password"
+                minlength="6"
+                required
+            >
+
+
+            <button
+                type="submit"
+                class="register-button">
+
+                Create Account
+
+            </button>
+
+        </form>
+
+
+        <!-- ======================================================
+             LOGIN LINK
+             ====================================================== -->
+
+        <p class="register-login">
+
+            Already have an account?
+
+            <a href="{{ url_for('login') }}">
+                Login here
+            </a>
+
+        </p>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

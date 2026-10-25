@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analysis History — AI-Based Fake Job Detection and Verification System</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <div style="display: flex; justify-content: flex-end; gap: 15px; padding: 15px 25px;">
+    <a href="{{ url_for('index') }}">
+        New Analysis
+    </a>
+
+    <a href="{{ url_for('logout') }}">
+        Logout
+    </a>
+</div>
+  <div class="page">
+
+    <header class="masthead">
+      <p class="masthead__brand">AI-Based Fake Job Detection and Verification System</p>
+      <h1>Analysis History</h1>
+      <p>A record of every job posting analyzed so far, newest first. Each
+        row shows a short summary of the ML prediction and the company
+        verification result — not the full posting text.</p>
+    </header>
+
+    {% if not history %}
+
+      <section class="section">
+        <p class="no-indicators">No analysis history available.</p>
+      </section>
+
+    {% else %}
+
+      <section class="section">
+        <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Analysis date</th>
+              <th scope="col">Job title</th>
+              <th scope="col">Company name</th>
+              <th scope="col">ML prediction</th>
+              <th scope="col">ML risk score</th>
+              <th scope="col">ML risk level</th>
+              <th scope="col">Verification score</th>
+              <th scope="col">Verification level</th>
+              <th scope="col">Domain comparison</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for record in history %}
+              {% set ml_level = record.ml_risk_level %}
+              {% if ml_level == 'Low Risk' %}
+                {% set ml_pill_class = 'pill--low' %}
+              {% elif ml_level == 'Medium Risk' %}
+                {% set ml_pill_class = 'pill--medium' %}
+              {% else %}
+                {% set ml_pill_class = 'pill--high' %}
+              {% endif %}
+
+              {% set v_level = record.verification_level %}
+              {% if v_level == 'Low Risk' %}
+                {% set v_pill_class = 'pill--low' %}
+              {% elif v_level == 'Medium Risk' %}
+                {% set v_pill_class = 'pill--medium' %}
+              {% elif v_level %}
+                {% set v_pill_class = 'pill--high' %}
+              {% else %}
+                {% set v_pill_class = None %}
+              {% endif %}
+
+              <tr>
+                <td>{{ record.analyzed_at.replace('T', ' ') if record.analyzed_at else '—' }}</td>
+                <td>{{ record.job_title or '—' }}</td>
+                <td>{{ record.company_name or '—' }}</td>
+                <td>{{ record.predicted_label or '—' }}</td>
+                <td>{{ "%.2f"|format(record.ml_risk_score) if record.ml_risk_score is not none else '—' }}</td>
+                <td>
+                  {% if ml_level %}
+                    <span class="pill {{ ml_pill_class }}">{{ ml_level }}</span>
+                  {% else %}
+                    —
+                  {% endif %}
+                </td>
+                <td>{{ "%.2f"|format(record.verification_score) if record.verification_score is not none else '—' }}</td>
+                <td>
+                  {% if v_pill_class %}
+                    <span class="pill {{ v_pill_class }}">{{ v_level }}</span>
+                  {% else %}
+                    —
+                  {% endif %}
+                </td>
+                <td>{{ record.domain_comparison|replace('_', ' ')|title if record.domain_comparison else '—' }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        </div>
+      </section>
+
+    {% endif %}
+
+    <div class="result-actions">
+      <a href="{{ url_for('index') }}" class="btn btn--secondary">Back to analyzer</a>
+    </div>
+
+  </div>
+</body>
+</html>

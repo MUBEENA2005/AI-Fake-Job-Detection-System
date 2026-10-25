@@ -1,0 +1,649 @@
+/* ==================================================================
+   AI-Based Fake Job Detection and Verification System
+   Stylesheet — final UI pass
+
+   DESIGN CONCEPT: a clean, modern "analysis dashboard" look — soft
+   neutral canvas, elevated white cards for every content block, one
+   restrained accent color, and strong, unmistakable color coding for
+   Low / Medium / High risk. Plain CSS only, no build step, no
+   external libraries.
+
+   Palette:
+     --ink         #16233B   deep navy-charcoal (headings, strong text)
+     --canvas      #F3F5F7   soft neutral page background
+     --panel       #FFFFFF   card background
+     --line        #E1E4E8   card border / divider grey
+     --text        #2B3245   body text
+     --text-muted  #5B6472   secondary text
+     --accent      #2E6E62   deep teal (links, focus ring, primary button)
+     --risk-low    #2F7A50   green   (genuine / low risk)
+     --risk-med    #B8862E   amber   (medium risk)
+     --risk-high   #C0392B   red     (fraudulent / high risk)
+
+   Type:
+     Inter, with a full native fallback stack so the page still looks
+     clean and professional even with no internet access — Inter is
+     never loaded from a CDN, only referenced by name.
+     Risk scores use a monospace stack to read as measured data.
+   ================================================================== */
+
+:root {
+  --ink: #16233b;
+  --canvas: #f3f5f7;
+  --panel: #ffffff;
+  --line: #e1e4e8;
+  --text: #2b3245;
+  --text-muted: #5b6472;
+  --accent: #2e6e62;
+  --accent-dark: #204e45;
+  --accent-soft: #e7f0ee;
+
+  --risk-low: #2f7a50;
+  --risk-low-bg: #e8f4ec;
+  --risk-med: #b8862e;
+  --risk-med-bg: #faf1de;
+  --risk-high: #c0392b;
+  --risk-high-bg: #fbe9e7;
+
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 1px 2px rgba(22, 35, 59, 0.04), 0 1px 12px rgba(22, 35, 59, 0.04);
+
+  --font-body: "Inter", -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-display: "Inter", -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: "SF Mono", Consolas, "Cascadia Mono", ui-monospace, "Courier New", monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--canvas);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--accent);
+}
+
+code {
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+  background: var(--accent-soft);
+  color: var(--accent-dark);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+/* Visible keyboard focus everywhere */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Page shell
+   ------------------------------------------------------------------ */
+.page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 24px 96px;
+}
+
+.masthead {
+  padding: 48px 0 32px;
+  margin-bottom: 8px;
+}
+
+.masthead__brand {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--accent);
+  margin: 0 0 12px;
+}
+
+.masthead h1 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 32px;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  margin: 0 0 12px;
+  color: var(--ink);
+}
+
+.masthead p {
+  margin: 0 0 20px;
+  max-width: 60ch;
+  color: var(--text-muted);
+  font-size: 15.5px;
+}
+
+/* ------------------------------------------------------------------
+   Cards (form sections, result sections, info blocks — all share
+   this one card treatment for visual consistency across every page)
+   ------------------------------------------------------------------ */
+.section {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 28px 32px;
+  margin-bottom: 20px;
+}
+
+.section__title {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--ink);
+  margin: 0 0 4px;
+}
+
+.section__hint {
+  font-size: 13.5px;
+  color: var(--text-muted);
+  margin: 0 0 20px;
+}
+
+/* ------------------------------------------------------------------
+   Notices / alerts
+   ------------------------------------------------------------------ */
+.notice {
+  border: 1px solid var(--risk-high);
+  background: var(--risk-high-bg);
+  color: var(--risk-high);
+  padding: 14px 18px;
+  border-radius: var(--radius-sm);
+  font-size: 14.5px;
+  font-weight: 500;
+  margin-bottom: 20px;
+}
+
+.notice--muted {
+  border-color: var(--line);
+  background: var(--panel);
+  color: var(--text-muted);
+}
+
+/* ------------------------------------------------------------------
+   Form fields
+   ------------------------------------------------------------------ */
+.field-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px 20px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.field--full {
+  grid-column: 1 / -1;
+}
+
+.field label {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.field label .optional {
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.field input[type="text"],
+.field textarea,
+.field select {
+  font: inherit;
+  font-size: 14.5px;
+  color: var(--text);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 10px 13px;
+  width: 100%;
+  transition: border-color 0.12s ease, box-shadow 0.12s ease;
+}
+
+.field textarea {
+  resize: vertical;
+  min-height: 90px;
+  font-family: inherit;
+}
+
+.field input[type="text"]:hover,
+.field textarea:hover,
+.field select:hover {
+  border-color: #c7ccd1;
+}
+
+.field input[type="text"]:focus,
+.field textarea:focus,
+.field select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.checkbox-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.checkbox-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.checkbox-row input[type="checkbox"] {
+  margin-top: 3px;
+  width: 17px;
+  height: 17px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.checkbox-row label {
+  font-size: 14.5px;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.checkbox-row .field__hint {
+  display: block;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.field-hint {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.form-actions {
+  padding-top: 8px;
+}
+
+.form-actions .disclaimer {
+  margin-top: 16px;
+  margin-bottom: 0;
+}
+
+/* ------------------------------------------------------------------
+   Buttons
+   ------------------------------------------------------------------ */
+.btn {
+  display: inline-block;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--accent);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 13px 28px;
+  cursor: pointer;
+  transition: background-color 0.12s ease, box-shadow 0.12s ease;
+}
+
+.btn:hover {
+  background: var(--accent-dark);
+  box-shadow: 0 2px 8px rgba(46, 110, 98, 0.28);
+}
+
+.btn--secondary {
+  background: var(--panel);
+  color: var(--ink);
+  border: 1px solid var(--line);
+}
+
+.btn--secondary:hover {
+  background: var(--canvas);
+  box-shadow: none;
+}
+
+@media (max-width: 620px) {
+  .field-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Result page — verdict panels
+   ------------------------------------------------------------------ */
+.verdict {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-left: 6px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 28px 32px;
+  margin-bottom: 20px;
+}
+
+.verdict--genuine {
+  border-left-color: var(--risk-low);
+  background: var(--risk-low-bg);
+}
+
+.verdict--fraudulent {
+  border-left-color: var(--risk-high);
+  background: var(--risk-high-bg);
+}
+
+.verdict__label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin: 0 0 6px;
+}
+
+.verdict__value {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 30px;
+  letter-spacing: -0.01em;
+  margin: 0 0 22px;
+  color: var(--ink);
+}
+
+.verdict__value--genuine {
+  color: var(--risk-low);
+}
+
+.verdict__value--fraudulent {
+  color: var(--risk-high);
+}
+
+.verdict__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 28px;
+  align-items: baseline;
+}
+
+.verdict__explainer {
+  font-size: 14px;
+  color: var(--text);
+  margin: 16px 0 0;
+  padding-top: 16px;
+  border-top: 1px solid rgba(22, 35, 59, 0.08);
+}
+
+.verdict__score-label {
+  font-size: 13px;
+  color: var(--text-muted);
+  display: block;
+  margin-bottom: 4px;
+}
+
+.verdict__score {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 25px;
+  color: var(--ink);
+}
+
+/* ------------------------------------------------------------------
+   Risk / status pills
+   ------------------------------------------------------------------ */
+.pill {
+  display: inline-block;
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  padding: 5px 13px;
+  border-radius: 999px;
+}
+
+.pill--low {
+  color: var(--risk-low);
+  background: var(--risk-low-bg);
+}
+
+.pill--medium {
+  color: var(--risk-med);
+  background: var(--risk-med-bg);
+}
+
+.pill--high {
+  color: var(--risk-high);
+  background: var(--risk-high-bg);
+}
+
+/* ------------------------------------------------------------------
+   Result sections (risk indicators, model used, verification findings)
+   ------------------------------------------------------------------ */
+.result-section {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 26px 32px;
+  margin-bottom: 20px;
+}
+
+.result-section__title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0 0 14px;
+}
+
+.indicator-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+
+.indicator-list li {
+  font-size: 14.5px;
+  padding-left: 20px;
+  position: relative;
+}
+
+.indicator-list li::before {
+  content: "\2014"; /* em dash marker */
+  position: absolute;
+  left: 0;
+  color: var(--text-muted);
+}
+
+.no-indicators {
+  font-size: 14.5px;
+  color: var(--text-muted);
+}
+
+.model-used {
+  font-size: 14.5px;
+  color: var(--text);
+}
+
+.model-used span {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.disclaimer {
+  border: 1px solid var(--line);
+  background: var(--canvas);
+  border-radius: var(--radius-sm);
+  padding: 16px 20px;
+  font-size: 13.5px;
+  color: var(--text-muted);
+  font-style: italic;
+  margin-top: 4px;
+  margin-bottom: 20px;
+}
+
+.result-actions {
+  padding-top: 8px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* ------------------------------------------------------------------
+   Company verification additions
+   ------------------------------------------------------------------ */
+.part-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin: 0 0 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.verdict--risk-low {
+  border-left-color: var(--risk-low);
+  background: var(--risk-low-bg);
+}
+
+.verdict--risk-medium {
+  border-left-color: var(--risk-med);
+  background: var(--risk-med-bg);
+}
+
+.verdict--risk-high {
+  border-left-color: var(--risk-high);
+  background: var(--risk-high-bg);
+}
+
+.kv-list {
+  margin: 4px 0 22px;
+  padding: 0;
+}
+
+.kv-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.kv-row:last-child {
+  border-bottom: none;
+}
+
+.kv-row dt {
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--text-muted);
+}
+
+.kv-row dd {
+  margin: 0;
+  font-size: 14px;
+  font-family: var(--font-mono);
+  color: var(--text);
+  text-align: right;
+  word-break: break-word;
+}
+
+/* ------------------------------------------------------------------
+   History table
+   ------------------------------------------------------------------ */
+.table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+
+thead th {
+  text-align: left;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 8px 14px 12px;
+  border-bottom: 2px solid var(--line);
+  white-space: nowrap;
+}
+
+tbody td {
+  padding: 13px 14px;
+  border-bottom: 1px solid var(--line);
+  color: var(--text);
+  white-space: nowrap;
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+tbody tr:hover td {
+  background: var(--canvas);
+}
+
+/* ------------------------------------------------------------------
+   Responsive tweaks for small phone screens
+   ------------------------------------------------------------------ */
+@media (max-width: 480px) {
+  .page {
+    padding: 0 16px 72px;
+  }
+
+  .masthead {
+    padding: 32px 0 24px;
+  }
+
+  .masthead h1 {
+    font-size: 26px;
+  }
+
+  .section,
+  .verdict,
+  .result-section {
+    padding: 22px 20px;
+  }
+
+  .verdict__value {
+    font-size: 25px;
+  }
+
+  .verdict__score {
+    font-size: 21px;
+  }
+}

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analysis Result — AI-Based Fake Job Detection and Verification System</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="page">
+
+    <header class="masthead">
+      <p class="masthead__brand">AI-Based Fake Job Detection and Verification System</p>
+      <h1>Analysis Result</h1>
+      <p>This result comes directly from the trained model's <code>predict_job()</code> function — nothing on this page is recalculated by the web layer.</p>
+    </header>
+
+    {% set is_fraudulent = (result.predicted_label == 'Fraudulent') %}
+    {% set risk_level = result.risk_level %}
+    {% if risk_level == 'Low Risk' %}
+      {% set pill_class = 'pill--low' %}
+    {% elif risk_level == 'Medium Risk' %}
+      {% set pill_class = 'pill--medium' %}
+    {% else %}
+      {% set pill_class = 'pill--high' %}
+    {% endif %}
+
+    <div class="verdict {% if is_fraudulent %}verdict--fraudulent{% else %}verdict--genuine{% endif %}">
+      <p class="verdict__label">Model prediction</p>
+      <p class="verdict__value {% if is_fraudulent %}verdict__value--fraudulent{% else %}verdict__value--genuine{% endif %}">
+        {{ result.predicted_label }}
+      </p>
+
+      <div class="verdict__meta">
+        <div>
+          <span class="verdict__score-label">Model-derived risk score</span>
+          <span class="verdict__score">{{ "%.2f"|format(result.risk_score) }} / 100</span>
+        </div>
+        <div>
+          <span class="verdict__score-label">Risk level</span>
+          <span class="pill {{ pill_class }}">{{ risk_level }}</span>
+        </div>
+      </div>
+    </div>
+
+    <section class="result-section">
+      <h2 class="result-section__title">Risk indicators</h2>
+      {% if result.risk_indicators %}
+        <ul class="indicator-list">
+          {% for indicator in result.risk_indicators %}
+            <li>{{ indicator }}</li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="no-indicators">No rule-based risk indicators were detected for this posting.</p>
+      {% endif %}
+    </section>
+
+    <section class="result-section">
+      <h2 class="result-section__title">Model used</h2>
+      <p class="model-used"><span>{{ result.model_name }}</span></p>
+    </section>
+
+    <div class="disclaimer">
+      {{ result.disclaimer }}
+    </div>
+
+    <div class="result-actions">
+      <a href="{{ url_for('index') }}" class="btn btn--secondary">Analyze another job</a>
+    </div>
+
+  </div>
+</body>
+</html>
